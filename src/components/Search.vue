@@ -1,5 +1,5 @@
 <template>
-    <h3>Search</h3> &nbsp;
+    <span class="filter-header">Filter</span>
     <input class="search-input"
       @input="$emit('changedFilter' , filterText )"
       v-model="filterText"
@@ -21,5 +21,14 @@ export default {
 .search-input{
   border: 1px solid black;
   border-radius: 10px;
+
+  font-size: 1.2em;
 }
+
+.filter-header {
+  font-size:1.5em;
+  font-weight: bold;
+  padding: 10px;
+}
+
 </style>

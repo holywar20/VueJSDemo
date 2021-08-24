@@ -29,7 +29,7 @@
 
     <div class="county-data-table">
       <div class="row-header">
-        <span>County <span v-if="stateObject">{{ stateObject.counties }}</span></span>
+        <span>County <span v-if="stateObject"> (x{{ stateObject.counties }})</span></span>
         <span>Population</span>
       </div>
       <div class="row" :key="county.county" v-for="county in countyData">
