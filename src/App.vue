@@ -3,15 +3,27 @@
     <h1>National Retail Solutions State Selector</h1>
     
     <div class="row right-justify">
-      <Search></Search>
+      <Search @changedFilter="onChangedFilter"></Search>
     </div>
     
     <div class="row tri-pane">
-      <StateList :filtered='null' :listStates="appStates" :title="`Primary List`"/>
-      <StateData :stateData="selectedState"/>
+      <!-- First list not meant to be filtered -->
       <StateList 
-        @testEmit="testEmit()"
-        :filtered='filter' 
+        @stateClicked="onStateClicked"
+        @stateDoubleClicked="onStateDoubleClick"
+
+        :filtered="''" 
+        :listStates="appStates" 
+        :title="`Primary List`"/>
+      <StateData
+        :countyData="selectedStateCounties" 
+        :stateObject="selectedState"/>
+      <!-- This list should be filtered -->
+      <StateList
+        @stateClicked="onStateClicked"
+        @stateDoubleClicked="onStateDoubleClick"
+        
+        :filtered="filter" 
         :listStates="appStates" 
         :title="`Filtered List`"/>
     </div>
@@ -20,6 +32,7 @@
 
 <script>
 
+import StateAPI from './services/StateAPI.js';
 
 import StateData from './components/StateData.vue'
 import StateList from './components/StateList.vue'
@@ -33,29 +46,42 @@ export default {
 
   data(){
     return { 
-      appStates : []
+      appStates : [],
+      highlightedStates : [],
+      selectedStateCounties : [],
+      selectedState : null,
+      filter : ""
     }
   },
   // Life cycle methods
-  created(){
-    this.appStates = [{
-      "state": "Alabama",
-      "population": 4833722,
-      "counties": 67,
-      "detail": "http://pos.idtretailsolutions.com/countytest/states/Alabama"
-    } , {
-      "state": "Alaska",
-      "population": 735132,
-      "counties": 29,
-      "detail": "http://pos.idtretailsolutions.com/countytest/states/Alaska"
-    }]
+  async mounted(){
+    var data = await StateAPI.getStates();
+    this.appStates = data;
   },
   methods : {
-    onSelected(){
-
+    // Responses to emit requests
+    onChangedFilter( filterText ){
+      this.filter = filterText;
     },
-    testEmit(){
-      console.log("testEmit")
+    async onStateClicked( stateObject ){
+      var data = await StateAPI.getCounties( stateObject );
+
+      this.selectedStateCounties = data;
+      this.selectedState = stateObject;
+      
+      this.appStates.forEach( ( sObject ) => {
+        if( stateObject.state == sObject.state )
+          sObject.selected = true;
+        else
+          sObject.selected = false;
+      });
+    },
+    onStateDoubleClick( stateObject ){
+      this.appStates.forEach( ( sObject ) => {
+        if( stateObject.state == sObject.state ){
+          sObject.highlight = !sObject.highlight;
+        } 
+      });
     }
   }
 }// <-- End of Component -->

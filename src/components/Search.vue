@@ -1,8 +1,8 @@
 <template>
     <h3>Search</h3> &nbsp;
     <input class="search-input"
-      @keypress="onChange()"
-
+      @input="$emit('changedFilter' , filterText )"
+      v-model="filterText"
     />
 </template>
 
@@ -10,11 +10,10 @@
 export default {
   name: 'Header',
   components: {},
-  methods : {
-    onChange(){
-      console.log("Bluring!")
-    }
-  }
+  props : {
+    filterText : String
+  },
+  emits:['changedFilter']
 }
 </script>
 
